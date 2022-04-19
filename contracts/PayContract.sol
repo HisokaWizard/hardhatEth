@@ -35,16 +35,15 @@ contract PayContract {
     }
 
     function makeSale(address _customer, uint _hash) external payable {
+      console.log(_customer, _hash, msg.sender, msg.value);
       require(msg.value == vendors[_hash].salePrice * 1000000000000000000 + contractPrice);
-      console.log("We are here");
       payable(vendors[_hash].vendor).transfer(msg.value - contractPrice);
       payable(owner).transfer(contractPrice);
       vendors[_hash].vendor = _customer;
     }
 
-    function changeVendorData(ContractItem memory _data, uint _hash) public {
-        bool condition = uint(keccak256(abi.encodePacked(_data.contractContent))) == _hash;
-        require(condition && vendors[_hash].vendor == msg.sender && _data.vendor == msg.sender);
-        vendors[_hash] = _data;
+    function changeItemData(uint _salePrice, uint _hash) public {
+        require(vendors[_hash].vendor == msg.sender);
+        vendors[_hash].salePrice = _salePrice;
     }
 }
