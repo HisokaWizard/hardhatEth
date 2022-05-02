@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.12;
+pragma solidity ^0.8.11;
 
 contract Random {
     function random(uint256 number) internal view returns (uint256) {

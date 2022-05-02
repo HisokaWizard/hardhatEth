@@ -1,5 +1,7 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.12;
+pragma solidity ^0.8.11;
+
+import "hardhat/console.sol";
 
 contract NetherLandsAuctionPlatform {
     struct Auction {
@@ -71,6 +73,8 @@ contract NetherLandsAuctionPlatform {
             seller: msg.sender
         });
 
+        console.log("Start time when create auction: ", auction.startTime);
+
         auctions.push(auction);
 
         emit AuctionCreated(
@@ -84,6 +88,9 @@ contract NetherLandsAuctionPlatform {
 
     function getCurrentPrice(uint256 index) public view returns (uint256) {
         Auction memory auction = auctions[index];
+        console.log("Auction: ", auction.item);
+        console.log("current time: ", block.timestamp);
+        console.log("start time: ", auction.startTime);
         return
             auction.startPrice -
             (block.timestamp - auction.startTime) *
@@ -94,6 +101,7 @@ contract NetherLandsAuctionPlatform {
         uint256 currentPrice = getCurrentPrice(index);
         require(msg.value >= currentPrice, "You don't have enough money");
         Auction storage auction = auctions[index];
+        require(auction.finished == false, "Finished!");
         require(msg.sender != auction.seller, "Seller can't buy item");
         auction.endPrice = currentPrice;
         auction.finished = true;

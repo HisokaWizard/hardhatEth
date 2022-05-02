@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.12;
+pragma solidity ^0.8.11;
 
 contract BritishAuctionPlatform {
     struct Rate {
@@ -53,8 +53,7 @@ contract BritishAuctionPlatform {
     function createAuction(
         string memory _item,
         uint256 _startPrice,
-        uint256 _duration,
-        uint256 _sale
+        uint256 _duration
     ) public {
         require(msg.sender != owner, "Owner can't create auction");
         uint256 duration = _duration == 0 ? DURATION : _duration;
@@ -84,11 +83,14 @@ contract BritishAuctionPlatform {
         );
     }
 
-    function setYouRate(uint256 index, uint256 rate) public payable {
+    function setYouRate(uint256 index) public payable {
         Auction storage auction = auctions[index];
-        require(auction.startPrice < rate, "You rate less than start price");
-        require(auction.maxRate.rate < rate, "You rate don't maximum");
-        Rate memory maxRate = Rate({buyer: msg.sender, rate: rate});
+        require(
+            auction.startPrice < msg.value,
+            "You rate less than start price"
+        );
+        require(auction.maxRate.rate < msg.value, "You rate don't maximum");
+        Rate memory maxRate = Rate({buyer: msg.sender, rate: msg.value});
         if (auction.maxRate.buyer != address(0) && auction.maxRate.rate > 0) {
             payable(auction.maxRate.buyer).transfer(auction.maxRate.rate);
         }
