@@ -22,5 +22,8 @@ module.exports = {
     ],
     camelcase: "off",
     "node/no-missing-import": "off",
+    "node/no-missing-require": "off",
+    "no-use-before-define": "off",
   },
+  ignorePatterns: ["webpack.config.js"],
 };
