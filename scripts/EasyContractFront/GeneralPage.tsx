@@ -1,48 +1,90 @@
 import { ethers } from "ethers";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { EasyContract__factory } from "../../typechain";
 
 const easyContractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-const onwerAddress =
-  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-const getContract = async () => {
+
+const requestAccount = async () => {
+  await (window as any)?.ethereum?.request({ method: "eth_requestAccounts" });
+};
+
+const getContract = async (tranzaction?: boolean) => {
   if (!(typeof (window as any).ethereum !== "undefined")) return;
+  await requestAccount();
   const provider = new ethers.providers.Web3Provider((window as any).ethereum);
-  const walletSigner = new ethers.Wallet(onwerAddress, provider);
-  const contract = await new ethers.Contract(
+  const signer = provider.getSigner();
+  if (!tranzaction) {
+    return getContractByProvider(provider);
+  } else {
+    return getContractBySigner(signer);
+  }
+};
+
+const getContractByProvider = async (
+  provider: ethers.providers.Web3Provider
+) => {
+  return await new ethers.Contract(
     easyContractAddress,
     EasyContract__factory.abi,
-    walletSigner
+    provider
   );
-  return contract;
+};
+
+const getContractBySigner = async (signer: ethers.providers.JsonRpcSigner) => {
+  return await new ethers.Contract(
+    easyContractAddress,
+    EasyContract__factory.abi,
+    signer
+  );
 };
 
 export const GeneralPage = () => {
   const [value, setValue] = useState("0");
-  const contract = getContract();
+  const [easyContract, setEasyContract] = useState<ethers.Contract | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    getContract()
+      .then((contract) => {
+        setEasyContract(contract);
+      })
+      .catch((error) => console.log(error));
+  }, []);
+
+  useEffect(() => {
+    workingValue()
+      .then(() => console.log(value))
+      .catch((error) => console.log(error));
+  }, [easyContract]);
 
   const plus = async (value: number) => {
-    await (await contract)?.plus(value);
-    await workingValue();
+    const contract = await getContract(true);
+    await contract?.plus(value);
+    setEasyContract(contract);
   };
 
   const minus = async (value: number) => {
-    await (await contract)?.minus(value);
-    await workingValue();
+    const contract = await getContract(true);
+    await contract?.minus(value);
+    setEasyContract(contract);
   };
 
   const multiple = async (value: number) => {
-    await (await contract)?.multiple(value);
-    await workingValue();
+    const contract = await getContract(true);
+    await contract?.multiple(value);
+    setEasyContract(contract);
   };
 
   const divide = async (value: number) => {
-    await (await contract)?.divide(value);
-    await workingValue();
+    const contract = await getContract(true);
+    await contract?.divide(value);
+    setEasyContract(contract);
   };
 
   const workingValue = async () => {
-    const workingValue = (await (await contract)?.workingValue()).toString();
+    if (!easyContract) return;
+    const workingValue = (await easyContract?.workingValue())?.toString();
     setValue(workingValue);
   };
 
