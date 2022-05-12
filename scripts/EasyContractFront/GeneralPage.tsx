@@ -60,25 +60,29 @@ export const GeneralPage = () => {
 
   const plus = async (value: number) => {
     const contract = await getContract(true);
-    await contract?.plus(value);
+    const tx = await contract?.plus(value);
+    await tx.wait();
     setEasyContract(contract);
   };
 
   const minus = async (value: number) => {
     const contract = await getContract(true);
-    await contract?.minus(value);
+    const tx = await contract?.minus(value);
+    await tx.wait();
     setEasyContract(contract);
   };
 
   const multiple = async (value: number) => {
     const contract = await getContract(true);
-    await contract?.multiple(value);
+    const tx = await contract?.multiple(value);
+    await tx.wait();
     setEasyContract(contract);
   };
 
   const divide = async (value: number) => {
     const contract = await getContract(true);
-    await contract?.divide(value);
+    const tx = await contract?.divide(value);
+    await tx.wait();
     setEasyContract(contract);
   };
 
