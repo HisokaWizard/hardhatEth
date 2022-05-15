@@ -4,14 +4,16 @@ import { EasyContract__factory } from "../../typechain";
 
 const easyContractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
+const _window = window as any;
+
 const requestAccount = async () => {
-  await (window as any)?.ethereum?.request({ method: "eth_requestAccounts" });
+  await _window?.ethereum?.request({ method: "eth_requestAccounts" });
 };
 
 const getContract = async (tranzaction?: boolean) => {
-  if (!(typeof (window as any).ethereum !== "undefined")) return;
+  if (!(typeof _window?.ethereum !== "undefined")) return;
   await requestAccount();
-  const provider = new ethers.providers.Web3Provider((window as any).ethereum);
+  const provider = new ethers.providers.Web3Provider(_window?.ethereum);
   const signer = provider.getSigner();
   if (!tranzaction) {
     return getContractByProvider(provider);
@@ -40,6 +42,7 @@ const getContractBySigner = async (signer: ethers.providers.JsonRpcSigner) => {
 
 export const GeneralPage = () => {
   const [value, setValue] = useState("0");
+  const [inputValue, setInputValue] = useState(1);
   const [easyContract, setEasyContract] = useState<ethers.Contract | undefined>(
     undefined
   );
@@ -57,6 +60,23 @@ export const GeneralPage = () => {
       .then(() => console.log(value))
       .catch((error) => console.log(error));
   }, [easyContract]);
+
+  // Functionality works, but expectation is not ordinary - will reseach it
+  // easyContract?.on("wasPlus", (value: ethers.BigNumber) => {
+  //   console.log("wasPlus", value.toString());
+  // });
+
+  // easyContract?.on("wasMinus", (value: ethers.BigNumber) => {
+  //   console.log("wasMinus", value.toString());
+  // });
+
+  // easyContract?.on("wasMultiple", (value: ethers.BigNumber) => {
+  //   console.log("wasMultiple", value.toString());
+  // });
+
+  // easyContract?.on("wasDivide", (value: ethers.BigNumber) => {
+  //   console.log("wasDivide", value.toString());
+  // });
 
   const plus = async (value: number) => {
     const contract = await getContract(true);
@@ -95,10 +115,15 @@ export const GeneralPage = () => {
   return (
     <div>
       <div>General page! {easyContractAddress}</div>
-      <button onClick={() => plus(100)}>Plus +</button>
-      <button onClick={() => minus(10)}>Minus -</button>
-      <button onClick={() => multiple(2)}>Multiple *</button>
-      <button onClick={() => divide(5)}>Divide /</button>
+      <input
+        type="number"
+        value={inputValue}
+        onChange={(e) => setInputValue(+e.target.value)}
+      />
+      <button onClick={() => plus(inputValue)}>Plus +</button>
+      <button onClick={() => minus(inputValue)}>Minus -</button>
+      <button onClick={() => multiple(inputValue)}>Multiple *</button>
+      <button onClick={() => divide(inputValue)}>Divide /</button>
       <div>Working value: {value}</div>
     </div>
   );
