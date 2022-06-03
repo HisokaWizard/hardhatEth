@@ -12,11 +12,14 @@ contract TonyaNFTToken is ERC721, ERC721Burnable, Ownable {
 
     Counters.Counter private _tokenIdCounter;
 
+    mapping(uint256 => string) public uriById;
+
     constructor() ERC721("TonyaNFTToken", "TNNT") {}
 
-    function safeMint(address to) public onlyOwner {
+    function safeMint(address to, string calldata uri) public onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
+        uriById[tokenId] = uri;
         _safeMint(to, tokenId);
     }
 }
